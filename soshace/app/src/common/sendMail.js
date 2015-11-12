@@ -42,7 +42,7 @@ var SendMail = {
      * @returns {string}
      */
     getPasswordResetLink: function (locale, code) {
-        var host = Soshace.LOCAL_MACHINE ? Soshace.LOCAL_HOST : Soshace.PRODUCTION_HOST;
+        var host = Soshace.LOCAL_MACHINE ? Soshace.LOCAL_HOST + ':' + Soshace.PORT : Soshace.PRODUCTION_HOST;
         return 'http://' + host + '/' + locale + '/reset-password?code=' + code;
     },
 
