@@ -80,8 +80,7 @@ define([
         submitHandler: function (event) {
             var errors,
                 $email = this.elements.emailField,
-                emailValue = $.trim($email.val()),
-                _this = this;
+                emailValue = $.trim($email.val());
 
             event.preventDefault();
 
@@ -95,9 +94,34 @@ define([
             }
 
             this.model.save(null, {
-                success: _this.submitSuccessHandler,
-                error: _this.submitFailHandler
+                success: this.submitSuccessHandler.bind(this),
+                error: this.submitFailHandler.bind(this)
             });
+        },
+
+        parseResponseError: function (response) {
+            var error,
+                responseJSONError;
+
+            if (!response) {
+                return '';
+            }
+
+            responseJSONError = response.responseJSON && response.responseJSON.error;
+            if (responseJSONError) {
+                return responseJSONError;
+            }
+
+            try {
+                error = JSON.parse(response.responseText);
+                if (error.error) {
+                    error = error.error;
+                }
+            }  catch(e) {
+                error = '';
+            }
+
+            return error;
         },
 
         /**
@@ -110,14 +134,7 @@ define([
          * @returns {undefined}
          */
         submitSuccessHandler: function (model, response) {
-            var app = Soshace.app,
-                redirectUrl = response.redirect;
-
-            Soshace.profile = response.profile;
-            app.getView('.js-system-messages').collection.fetch().
-                done(function () {
-                    Backbone.history.navigate(redirectUrl, {trigger: true});
-                });
+            alert('success: check your email');
         },
 
         /**
@@ -130,7 +147,7 @@ define([
          * @returns {undefined}
          */
         submitFailHandler: function (model, response) {
-            var error = response.responseJSON && response.responseJSON.error;
+            var error = this.parseResponseError(response);
 
             if (typeof error === 'string') {
                 //TODO: добавить вывод системной ошибки

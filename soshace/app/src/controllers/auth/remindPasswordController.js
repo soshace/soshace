@@ -59,12 +59,11 @@ module.exports = Controller.extend({
             response = this.response,
             requestParams = new RequestParams(request),
             code = request.query.code,
-            now = new Date(),
+            now = Date.now(),
             MS_PER_DAY = 1000 * 60 * 60 * 24,
             TWO_DAYS = MS_PER_DAY * 2,
-            self = this
-            ;
-        now = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
+            self = this;
+
         PasswordResetModel.findOne({code: code}, function (error, resetCode) {
             if (error) {
                 self.renderError('Page not found', 404);
@@ -77,7 +76,6 @@ module.exports = Controller.extend({
                 return;
             }
             var timestamp = resetCode.timestamp;
-            timestamp = Date.UTC(timestamp.getFullYear(), timestamp.getMonth(), timestamp.getDate());
 
             if (now - timestamp > TWO_DAYS) {
                 self.renderError('Reset code outdated', 410);
@@ -199,53 +197,24 @@ module.exports = Controller.extend({
 
     },
 
+    saveResetPasswordToken: function(userId, email, callback) {
+        console.log('save reset password token');
+        var timestamp = Date.now(),
+            code = Helpers.encodeMd5(timestamp + email),
+            resetPasswordModel = {
+                code: code,
+                userId: userId,
+                timestamp: timestamp
+            };
 
-    /**
-     * onUpdatePasswordSuccess event
-     *
-     * @public
-     * @function
-     * @name RemindPasswordController#onUpdatePasswordSuccess
-     * @return {undefined}
-     */
+        PasswordResetModel.update({userId: userId}, resetPasswordModel, {upsert: true}, function(error) {
+            if (error) {
+                callback(error);
+                return;
+            }
 
-    onUpdatePasswordSuccess: function (error, user) {
-        if (error) {
-            this.renderError('Page not found', 404);
-        }
-        this.response.send({success: true});
-    },
-
-
-    /**
-     * Method validates email field
-     *
-     * @method
-     * @name RemindPasswordController#validateField
-     * @param {string} fieldValue
-     * @param {Function} callback
-     * @returns {undefined}
-     */
-    validateField: function (fieldValue, callback) {
-        var user = new UsersModel({
-                email: fieldValue
-            }),
-            request = this.request,
-            time = String((new Date()).getTime()),
-            code = Helpers.encodeMd5(time+fieldValue)
-            ;
-
-        UsersModel.findOne({email: fieldValue}, function (error, user) {
-            console.log(user);
-            PasswordResetModel.update({userId: user.id}, {code: code, userId: user.id, timestamp: new Date()}, {upsert: true}, function (error) {
-                console.log(error);
-            });
+            callback(null, code);
         });
-
-        user.emailExists(fieldValue);
-        //code = user.updatePasswordResetCode(fieldValue);
-        SendMail.sendPasswordResetMail(request, user, code);
-
     },
 
     /**
@@ -258,11 +227,55 @@ module.exports = Controller.extend({
      */
     remindPasswordHandler: function () {
         var request = this.request,
+            response = this.response,
             requestBody = request.body,
-            emailValue = requestBody.email;
+            emailValue = requestBody.email,
+            emailValidationError = UsersModel.validateEmail(emailValue),
+            self = this;
 
-        this.validateField(emailValue, function (error) {
-            console.log(error);
+        console.log('REMIND PASSWORD');
+        console.log('email:', emailValue);
+
+        if (emailValidationError) {
+            this.sendError({
+                error: {
+                    email: emailValidationError
+                }
+            });
+            return;
+        }
+
+        console.log('search user with email', emailValue);
+
+        UsersModel.findOne({email: emailValue}, function(err, user) {
+            if (err) {
+                console.error(err);
+                self.sendError(err);
+                return;
+            }
+
+            if (!user) {
+                console.log('user not found');
+                self.sendError('User not found', 400);
+                return;
+            }
+
+            console.log('found user', user.userName, 'going to reset password');
+
+            self.saveResetPasswordToken(user.id, emailValue, function(error, resetPasswordCode) {
+                console.log('password reset model callback');
+
+                if (error) {
+                    return console.error(error);
+                }
+
+                console.log('password update success', 'update code:', resetPasswordCode);
+
+                SendMail.sendPasswordResetMail(request, user, resetPasswordCode);
+
+                response.end();
+            });
+
         });
     }
 });

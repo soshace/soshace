@@ -68,16 +68,13 @@ define([
          * @returns {undefined}
          */
         initialize: function () {
+            // TODO BIND ALL SHOULD WORK
             _.bindAll(this,
                 'resetPasswordSuccess',
                 'resetPasswordFail'
             );
 
-            //Handlebars.registerPartial(
-            //    'auth/passwordResetView',
-            //    Soshace.hbs['partials/auth/remindPasswordSuccess']
-            //);
-
+            alert('this view!');
             Backbone.Validation.bind(this);
         },
 
@@ -104,8 +101,8 @@ define([
             }
 
             this.model.save(null, {
-                success: _this.resetPasswordSuccess,
-                error: _this.resetPasswordFail
+                success: _this.resetPasswordSuccess.bind(this),
+                error: _this.resetPasswordFail.bind(this)
             });
         },
 
@@ -139,6 +136,7 @@ define([
          * @returns {undefined}
          */
         resetPasswordSuccess: function (model, response) {
+            debugger;
             var app = Soshace.app,
                 locale = response.locale,
                 redirectUrl = '/' + locale;
@@ -160,6 +158,7 @@ define([
          * @returns {undefined}
          */
         resetPasswordFail: function (model, response) {
+            debugger;
             var responseJson = JSON.parse(response.responseText),
                 error = responseJson && responseJson.error;
 
