@@ -108,14 +108,10 @@ module.exports = Controller.extend({
         var request = this.request,
             confirmCode = request.query.code;
 
-        //TODO: добавить проверку, что пользователь уже подтвердил email
-        //TODO: добавить обработку ошибок и исключений
         UsersModel.confirmEmail(confirmCode, this.confirmEmailHandler);
     },
 
     /**
-     * TODO: добавить обработку ошибок
-     * TODO: здесь вылетает бага, если код подтверждения отправлен неверный
      *
      * Метод обработчик положительного
      * подтверждения кода пользователя
@@ -128,7 +124,7 @@ module.exports = Controller.extend({
      */
     confirmEmailHandler: function (error, user) {
         if (error) {
-            this.renderError('Server is too busy, try later', 503);
+            this.renderError(error, 503);
             return;
         }
         this.updateUserMessagesAfterConfirmEmail(user, this.loginUser);
