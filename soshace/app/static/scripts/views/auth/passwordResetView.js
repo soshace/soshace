@@ -76,6 +76,28 @@ define([
             Backbone.Validation.bind(this);
         },
 
+        setFieldDataAndGetInputErrors: function(formData) {
+            var errors,
+                passwordsMatch;
+
+            this.model.set(formData);
+
+             errors = this.model.validate();
+            if (errors) {
+                return errors;
+            }
+
+            passwordsMatch = formData.password === formData.confirmPassword;
+            if (!passwordsMatch) {
+                return {
+                    confirmPassword: 'Passwords don&#39;t match'
+                };
+            }
+
+            return false;
+
+        },
+
         /**
          * Submits password reset form
          *
@@ -86,13 +108,12 @@ define([
          */
         resetPasswordHandler: function (event) {
             var errors,
-                _this = this;
+                _this = this,
+                formData = Helpers.serializeForm(this.elements.passwordResetForm);
 
             event.preventDefault();
-            this.model.set(Helpers.serializeForm(this.elements.passwordResetForm));
-            console.log(Helpers.serializeForm(this.elements.passwordResetForm));
-            errors = this.model.validate();
 
+            errors = this.setFieldDataAndGetInputErrors(formData);
             if (errors) {
                 this.showFieldsErrors(errors);
                 return;
