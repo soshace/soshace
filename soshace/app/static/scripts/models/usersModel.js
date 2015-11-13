@@ -88,6 +88,16 @@ define([
         ],
 
         validation: {
+            email: [
+                {
+                    required: true,
+                    msg: 'Email can&#39;t be blank.'
+                },
+                {
+                    pattern: Soshace.patterns.email,
+                    msg: 'Email is invalid.'
+                }
+            ],
             password: [
                 {
                     required: true,
@@ -145,6 +155,25 @@ define([
             }
 
             return this.fetch();
+        },
+
+        login: function(loginData, callback) {
+            $.ajax({
+                type: "POST",
+                url: Soshace.urls.api.login,
+                dataType: 'json',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify(loginData),
+                success: function (model) {
+                    callback(null, model);
+                },
+                error: function (response) {
+                    // TODO: move parse server error method to utils and use it or at least add check for json parse
+                    callback(JSON.parse(response.responseText).error);
+                }
+            });
         },
 
         /**

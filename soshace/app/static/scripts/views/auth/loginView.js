@@ -91,10 +91,13 @@ define([
          */
         userLoginHandler: function (event) {
             var errors,
-                _this = this;
+                _this = this,
+                formData;
 
             event.preventDefault();
-            this.model.set(Helpers.serializeForm(this.elements.loginForm));
+
+            formData = Helpers.serializeForm(this.elements.loginForm);
+            this.model.set(formData);
             errors = this.model.validate();
 
             if (errors) {
@@ -102,9 +105,13 @@ define([
                 return;
             }
 
-            this.model.save(null, {
-                success: _this.userLoginSuccess,
-                error: _this.userLoginFail
+            this.model.login(formData, function(error, model) {
+                if (error) {
+                    _this.userLoginFail(error);
+                    return;
+                }
+
+                _this.userLoginSuccess(model);
             });
         },
 
@@ -133,17 +140,17 @@ define([
          *
          * @method
          * @name LoginView#userLoginSuccess
-         * @param {Backbone.Model} model
+         * @param {Backbone.Model} user
          * @param {Object} response в ответе приходит профиль пользователя
          * @returns {undefined}
          */
-        userLoginSuccess: function (model, response) {
+        userLoginSuccess: function (user) {
             var app = Soshace.app,
-                userName = response.userName,
-                locale = response.locale,
+                userName = user.userName,
+                locale = user.locale,
                 redirectUrl = '/' + locale + '/users/' + userName;
 
-            Soshace.profile = response;
+            Soshace.profile = user;
             app.getView('.js-system-messages').collection.fetch().
                 done(function () {
                     Backbone.history.navigate(redirectUrl, {trigger: true});
@@ -159,10 +166,7 @@ define([
          * @param {Object} response
          * @returns {undefined}
          */
-        userLoginFail: function (model, response) {
-            var responseJson = JSON.parse(response.responseText),
-                error = responseJson && responseJson.error;
-
+        userLoginFail: function (error) {
             if (typeof error === 'string') {
                 this.showAuthErrorMessage(error);
                 return;
