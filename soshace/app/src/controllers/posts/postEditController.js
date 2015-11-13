@@ -136,7 +136,7 @@ module.exports = Controller.extend({
             requestParams = new RequestParams(request),
             profile = requestParams.profile;
 
-        if (!request.isAuthenticated()) {
+        if (!requestParams.isAuthenticated) {
             return true;
         }
 

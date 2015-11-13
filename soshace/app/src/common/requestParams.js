@@ -25,9 +25,9 @@ module.exports = function (request) {
         version: Soshace.VERSION,
         helpers: helpers,
         locale: request.i18n.getLocale(),
-        isAuthenticated: request.isAuthenticated(),
+        isAuthenticated: profile && request.isAuthenticated(),
         paths: Soshace.PATHS,
-        profile: profile,
+        profile: profile || {},
         profileUserName: profileUserName,
         //для шаблонов
         backend: true
