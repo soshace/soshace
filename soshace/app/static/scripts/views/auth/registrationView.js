@@ -160,6 +160,22 @@ define([
         },
 
         /**
+         * Checks if input has error in cached validation results
+         *
+         * @method
+         * @name RegistrationView#checkCacheForError
+         * @param formData
+         * @returns {boolean}
+         */
+        checkCacheForError: function(formData) {
+            if (!formData) formData = {};
+            return _.some(formData, function(fieldValue, fieldName) {
+                var cachedValidationResult = this.getResponseFromCache(Helpers.camel(fieldName), fieldValue);
+                return cachedValidationResult.status === 'error';
+            }, this);
+        },
+
+        /**
          * Метод обработчик клика на кнопке 'Зарегистрироваться'
          *
          * @method
@@ -169,14 +185,23 @@ define([
          */
         userRegistrationHandler: function (event) {
             var errors,
-                _this = this;
+                _this = this,
+                formData,
+                isCachedError;
 
             event.preventDefault();
-            this.model.set(Helpers.serializeForm(this.elements.registrationForm));
-            errors = this.model.validate();
 
+            formData = Helpers.serializeForm(this.elements.registrationForm);
+            this.model.set(formData);
+
+            errors = this.model.validate();
             if (errors) {
                 this.showFieldsErrors(errors, true);
+                return;
+            }
+
+            isCachedError = this.checkCacheForError(formData);
+            if (isCachedError) {
                 return;
             }
 
