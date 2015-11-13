@@ -208,7 +208,7 @@ define([
                     return;
                 }
 
-                // TODO: show error message
+                // TODO: show success message
                 alert('password changed!');
             });
         },
