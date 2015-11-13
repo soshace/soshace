@@ -41,6 +41,24 @@ define([
         },
 
         /**
+         * Method makes converts hypen strings to camelCase
+         *
+         * @public
+         * @method
+         * @name Helpers.camel
+         * @param {String} value
+         * @returns {String}
+         */
+        camel: function(value) {
+            if (!value || typeof value.replace !== 'function') {
+                return value;
+            }
+            return value.replace(/-([a-z])/g, function (g) {
+                return g[1].toUpperCase();
+            });
+        },
+
+        /**
          * Метод возвращает сериализованную фому в виде объекта
          * {name1: value1, name2: value2}
          *
