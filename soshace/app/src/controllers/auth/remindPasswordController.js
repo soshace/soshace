@@ -95,7 +95,7 @@ module.exports = Controller.extend({
     },
 
     /**
-     * Changes a password
+     * Changes a password and removes password reset document
      *
      * @public
      * @function
@@ -113,13 +113,13 @@ module.exports = Controller.extend({
             self = this;
         PasswordResetModel.findOne({code: body.token}, function (error, resetCode) {
             if (error) {
-                self.renderError('Page not found', 404);
+                self.sendError('Page not found', 404);
                 console.log(error);
                 return;
             }
 
             if (!resetCode) {
-                self.renderError('Page not found', 404);
+                self.sendError('Page not found', 404);
                 return;
             }
 
@@ -127,15 +127,15 @@ module.exports = Controller.extend({
             timestamp = Date.UTC(timestamp.getFullYear(), timestamp.getMonth(), timestamp.getDate());
 
             if (now - timestamp > TWO_DAYS) {
-                self.renderError('Reset code outdated', 410);
+                self.sendError('Reset code outdated', 410);
                 return;
             }
 
             UsersModel.findOneAndUpdatePassword(resetCode.userId, body.password);
             response.send({success: true});
             Passport.authenticate('local', LoginController.authenticateHandler)(request, response, function() {});
+            PasswordResetModel.find({code: body.token}).remove();
         });
-
     },
 
     /**
@@ -197,8 +197,16 @@ module.exports = Controller.extend({
 
     },
 
+    /**
+     * Method saves password reset document and returns secret confirmation code in callback
+     *
+     * @method
+     * @param userId
+     * @param email
+     * @param callback
+     * @return {undefined}
+     */
     saveResetPasswordToken: function(userId, email, callback) {
-        console.log('save reset password token');
         var timestamp = Date.now(),
             code = Helpers.encodeMd5(timestamp + email),
             resetPasswordModel = {
@@ -218,7 +226,7 @@ module.exports = Controller.extend({
     },
 
     /**
-     * Method replaces old password with a new one
+     * Method sends email to confirm password change and checks if user with given email exists
      *
      * @public
      * @method
@@ -233,9 +241,6 @@ module.exports = Controller.extend({
             emailValidationError = UsersModel.validateEmail(emailValue),
             self = this;
 
-        console.log('REMIND PASSWORD');
-        console.log('email:', emailValue);
-
         if (emailValidationError) {
             this.sendError({
                 error: {
@@ -245,8 +250,6 @@ module.exports = Controller.extend({
             return;
         }
 
-        console.log('search user with email', emailValue);
-
         UsersModel.findOne({email: emailValue}, function(err, user) {
             if (err) {
                 console.error(err);
@@ -255,21 +258,16 @@ module.exports = Controller.extend({
             }
 
             if (!user) {
-                console.log('user not found');
                 self.sendError('User not found', 400);
                 return;
             }
 
-            console.log('found user', user.userName, 'going to reset password');
-
             self.saveResetPasswordToken(user.id, emailValue, function(error, resetPasswordCode) {
-                console.log('password reset model callback');
 
                 if (error) {
-                    return console.error(error);
+                    self.sendError('Server is too busy, try later', 503);
+                    return;
                 }
-
-                console.log('password update success', 'update code:', resetPasswordCode);
 
                 SendMail.sendPasswordResetMail(request, user, resetPasswordCode);
 

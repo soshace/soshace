@@ -68,13 +68,11 @@ define([
          * @returns {undefined}
          */
         initialize: function () {
-            // TODO BIND ALL SHOULD WORK
             _.bindAll(this,
                 'resetPasswordSuccess',
                 'resetPasswordFail'
             );
 
-            alert('this view!');
             Backbone.Validation.bind(this);
         },
 
@@ -101,8 +99,8 @@ define([
             }
 
             this.model.save(null, {
-                success: _this.resetPasswordSuccess.bind(this),
-                error: _this.resetPasswordFail.bind(this)
+                success: _this.resetPasswordSuccess,
+                error: _this.resetPasswordFail
             });
         },
 
@@ -127,7 +125,7 @@ define([
         },
 
         /**
-         * Метод обработчик успешной входа пользователя
+         * Method redirects user after successful password change
          *
          * @method
          * @name LoginView#userLoginSuccess
@@ -136,12 +134,11 @@ define([
          * @returns {undefined}
          */
         resetPasswordSuccess: function (model, response) {
-            debugger;
             var app = Soshace.app,
-                locale = response.locale,
-                redirectUrl = '/' + locale;
+                redirectUrl;
 
-            Soshace.profile = response;
+            Soshace.profile = model.toJSON();
+            redirectUrl = '/' + Soshace.profile.locale;
             app.getView('.js-system-messages').collection.fetch().
                 done(function () {
                     Backbone.history.navigate(redirectUrl, {trigger: true});
@@ -158,7 +155,6 @@ define([
          * @returns {undefined}
          */
         resetPasswordFail: function (model, response) {
-            debugger;
             var responseJson = JSON.parse(response.responseText),
                 error = responseJson && responseJson.error;
 

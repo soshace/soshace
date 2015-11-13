@@ -99,7 +99,16 @@ define([
             });
         },
 
+        /**
+         * Method parses response error from server
+         *
+         * @method
+         * @name RemindPasswordView#parseResponseError
+         * @param response
+         * @returns {*}
+         */
         parseResponseError: function (response) {
+            // TODO: move this method to utils
             var error,
                 responseJSONError;
 
