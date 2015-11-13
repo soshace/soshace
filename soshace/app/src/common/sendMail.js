@@ -28,7 +28,7 @@ var SendMail = {
      * @returns {string}
      */
     getConfirmationLink: function (locale, code) {
-        var host = Soshace.LOCAL_MACHINE ? Soshace.LOCAL_HOST : Soshace.PRODUCTION_HOST;
+        var host = Soshace.LOCAL_MACHINE ? Soshace.LOCAL_HOST + ':' + Soshace.PORT : Soshace.PRODUCTION_HOST;
         return 'http://' + host + '/' + locale + '/registration/confirm_email?code=' + code;
     },
 
