@@ -335,7 +335,6 @@ UsersShema.methods.getPublicFields = function () {
  * Шифруем пароль перед сохранением
  */
 UsersShema.pre('save', function (next) {
-    console.log('user pre save');
     var user = this;
 
     if (!user.isModified('password')) {
