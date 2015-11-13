@@ -76,6 +76,15 @@ define([
             Backbone.Validation.bind(this);
         },
 
+
+        /**
+         * Sets form data to model and validates it using cached results and model validation
+         *
+         * @name PasswordResetView#setFieldDataAndGetInputErrors
+         * @method
+         * @param formData
+         * @returns {*}
+         */
         setFieldDataAndGetInputErrors: function(formData) {
             var errors,
                 passwordsMatch;
