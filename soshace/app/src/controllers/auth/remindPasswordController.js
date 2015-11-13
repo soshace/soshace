@@ -131,10 +131,11 @@ module.exports = Controller.extend({
                 return;
             }
 
-            UsersModel.findOneAndUpdatePassword(resetCode.userId, body.password);
-            response.send({success: true});
-            Passport.authenticate('local', LoginController.authenticateHandler)(request, response, function() {});
-            PasswordResetModel.find({code: body.token}).remove();
+            PasswordResetModel.find({code: body.token}).remove(function() {
+                Passport.authenticate('local', LoginController.authenticateHandler)(request, response, function() {});
+                UsersModel.findOneAndUpdatePassword(resetCode.userId, body.password);
+                response.send({success: true});
+            });
         });
     },
 
