@@ -82,26 +82,6 @@ define([
         },
 
         /**
-         * Gets validation error for formData
-         *
-         * @method
-         * @name LoginView#getValidationError
-         * @param formData
-         * @returns {Object || null}
-         */
-        getValidationError: function(formData) {
-            var validationError = _.reduce(formData, function(errors, fieldValue, fieldName) {
-                var fieldError = this.model.preValidate(fieldName, fieldValue);
-                if (!_.isEmpty(fieldError)) {
-                    errors[fieldName] = fieldError;
-                }
-                return errors;
-            }, {}, this);
-
-            return _.isEmpty(validationError)? null: validationError;
-        },
-
-        /**
          * Login submit handler
          *
          * @method
@@ -119,19 +99,15 @@ define([
             formData = Helpers.serializeForm(this.elements.loginForm);
             this.model.set(formData);
 
-            errors = this.getValidationError(formData);
+            errors = Helpers.getValidationError(formData, this.model);
             if (errors) {
                 Helpers.showFieldsErrors(errors, true);
                 return;
             }
 
-            this.model.login(formData, function(error, model) {
-                if (error) {
-                    _this.userLoginFail(error);
-                    return;
-                }
-
-                _this.userLoginSuccess(model);
+            this.model.login(formData, {
+                success: _this.userLoginSuccess.bind(this),
+                error: _this.userLoginFail.bind(this)
             });
         },
 
@@ -167,6 +143,8 @@ define([
          * @returns {undefined}
          */
         userLoginFail: function (error) {
+            error = Helpers.parseResponseError(error);
+
             if (typeof error === 'string') {
                 this.showAuthErrorMessage(error);
                 return;

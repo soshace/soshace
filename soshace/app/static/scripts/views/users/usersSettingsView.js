@@ -156,13 +156,21 @@ define([
          * @returns {Object || null}
          */
         getFormError: function(formData) {
-            var error,
-                passwordsMatch;
+            var newPasswordError,
+                passwordsMatch,
+                oldPasswordError;
 
-            error = this.model.preValidate('password', formData.newPassword);
-            if (!_.isEmpty(error)) {
+            oldPasswordError = this.model.preValidate('password', formData.password);
+            if (!_.isEmpty(oldPasswordError)) {
                 return {
-                    newPassword: error
+                    password: oldPasswordError
+                }
+            }
+
+            newPasswordError = this.model.preValidate('password', formData.newPassword);
+            if (!_.isEmpty(newPasswordError)) {
+                return {
+                    newPassword: newPasswordError
                 };
             }
 
@@ -174,6 +182,20 @@ define([
             }
 
             return null;
+        },
+
+        updatePasswordSuccessHandler: function() {
+            alert('password changed!');
+        },
+
+        updatePasswordErrorHandler: function(response) {
+            var error = Helpers.parseResponseError(response);
+
+            if (error !== null) {
+                Helpers.showFieldsErrors(error, false);
+            } else {
+                console.error(response, response && response.responseText);
+            }
         },
 
         /**
@@ -197,14 +219,9 @@ define([
                 return;
             }
 
-            this.model.updatePassword(formData.password, formData.newPassword, function(error) {
-                if (error) {
-                    Helpers.showFieldsErrors(error.error, false);
-                    return;
-                }
-
-                // TODO: show success message
-                alert('password changed!');
+            this.model.updatePassword(formData.password, formData.newPassword, {
+                success: this.updatePasswordSuccessHandler.bind(this),
+                error: this.updatePasswordErrorHandler.bind(this)
             });
         },
 

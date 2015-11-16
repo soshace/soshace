@@ -256,6 +256,11 @@ define([
                 return;
             }
 
+            if (typeof error === 'string') {
+                console.error(error);
+                return;
+            }
+
             Helpers.showFieldsErrors(error, false);
         },
 

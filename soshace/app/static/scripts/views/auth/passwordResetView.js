@@ -83,28 +83,25 @@ define([
          * @name PasswordResetView#setFieldDataAndGetInputErrors
          * @method
          * @param formData
-         * @returns {*}
+         * @returns {Object || null}
          */
-        setFieldDataAndGetInputErrors: function(formData) {
-            var errors,
+        getValidationError: function(formData) {
+            var validationError = Helpers.getValidationError(formData, this.model),
                 passwordsMatch;
 
-            this.model.set(formData);
-
-            errors = this.model.validate();
-            if (errors !== undefined) {
-                return errors;
+            if (validationError !== null) {
+                return validationError;
             }
 
             passwordsMatch = formData.password === formData.confirmPassword;
+
             if (!passwordsMatch) {
                 return {
-                    confirmPassword: 'Passwords don&#39;t match'
+                    confirmPassword: 'Passwords must match'
                 };
             }
 
-            return false;
-
+            return null;
         },
 
         /**
@@ -122,13 +119,18 @@ define([
 
             event.preventDefault();
 
-            errors = this.setFieldDataAndGetInputErrors(formData);
-            if (errors) {
+            errors = this.getValidationError(formData);
+
+            if (errors !== null) {
                 Helpers.showFieldsErrors(errors, true);
                 return;
             }
 
-            this.model.save(null, {
+            this.model.resetPassword({
+                password: formData.password,
+                token: formData.token,
+                email: formData.email
+            }, {
                 success: _this.resetPasswordSuccess,
                 error: _this.resetPasswordFail
             });
@@ -147,8 +149,7 @@ define([
             var app = Soshace.app,
                 redirectUrl;
 
-            Soshace.profile = model.toJSON();
-            redirectUrl = '/' + Soshace.profile.locale;
+            redirectUrl = '/' + Helpers.getLocale();
             app.getView('.js-system-messages').collection.fetch().
                 done(function () {
                     Backbone.history.navigate(redirectUrl, {trigger: true});
@@ -164,18 +165,15 @@ define([
          * @param {Object} response
          * @returns {undefined}
          */
-        resetPasswordFail: function (model, response) {
-            var responseJson = JSON.parse(response.responseText),
-                error = responseJson && responseJson.error;
-
-            if (typeof error === 'string') {
-                this.showAuthErrorMessage(error);
-                return;
-            }
+        resetPasswordFail: function (response) {
+            var error = Helpers.parseResponseError(response);
 
             if (typeof error === 'object') {
                 Helpers.showFieldsErrors(error, true);
+                return;
             }
+
+            console.error(response && response.responseText, error);
         },
 
         /**

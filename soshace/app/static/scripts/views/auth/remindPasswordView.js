@@ -80,22 +80,24 @@ define([
         submitHandler: function (event) {
             var errors,
                 $email = this.elements.emailField,
-                emailValue = $.trim($email.val());
+                emailValue = $.trim($email.val()).toLowerCase();
 
             event.preventDefault();
 
             emailValue = emailValue.toLowerCase();
-            this.model.set('email', emailValue);
-            errors = this.model.validate();
 
-            if (errors) {
+            errors = Helpers.getValidationError({
+                email: emailValue
+            }, this.model);
+
+            if (!_.isEmpty(errors)) {
                 Helpers.showFieldsErrors(errors, true);
                 return;
             }
 
-            this.model.save(null, {
-                success: this.submitSuccessHandler.bind(this),
-                error: this.submitFailHandler.bind(this)
+            this.model.remindPassword(emailValue, {
+                success: this.submitSuccessHandler,
+                error: this.submitFailHandler
             });
         },
 
@@ -125,7 +127,12 @@ define([
             var error = Helpers.parseResponseError(response);
 
             if (error === null) {
-                console.error('remind password fail');
+                console.error('remind password error');
+                return;
+            }
+
+            if (typeof error === 'string') {
+                console.error(error);
                 return;
             }
 
