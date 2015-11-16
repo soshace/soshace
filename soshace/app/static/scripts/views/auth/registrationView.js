@@ -21,7 +21,7 @@ define([
     return Backbone.Layout.extend({
 
         /**
-         * Модель формы регистрации
+         * Registration form model
          *
          * @field
          * @name RegistrationView#model
@@ -30,7 +30,7 @@ define([
         model: null,
 
         /**
-         * Кеш ответов сервера на валидацию полей
+         * Server cache for fields validation
          *
          * @field
          * @name RegistrationView#cacheServerResponse
@@ -39,7 +39,7 @@ define([
         cacheServerResponse: null,
 
         /**
-         * Ссылки на DOM элементы вида
+         * Cached links to DOM elements
          *
          * @field
          * @name RegistrationView#elements
@@ -50,11 +50,12 @@ define([
         },
 
         /**
-         * Поле содержит обернутые в debounce
-         * методы setStatus отдельно для каждого поля
+         * Field includes debounce decorated methods
+         * setStatus for each field
          *
-         * У каждого поля должен быть свой debouce метод,
-         * чтобы ошибки показывались при быстрой смене фокуса
+         * each field must have it's own debounce method
+         * to show errors on fast focus change
+
          *
          * @field
          * @name RegistrationView#statusDebounceHandlers
@@ -63,7 +64,7 @@ define([
         statusDebounceHandlers: null,
 
         /**
-         * Список обработчиков событий
+         * View events
          *
          * @field
          * @name RegistrationView#events
@@ -77,7 +78,7 @@ define([
         },
 
         /**
-         * Путь до шаблона
+         * Template path
          *
          * @field
          * @name RegistrationView#template
@@ -133,19 +134,19 @@ define([
          * @method
          * @param fieldName
          * @param fieldValue
-         * @returns {Object | boolean}
+         * @returns {Object | null}
          */
         getResponseFromCache: function(fieldName, fieldValue) {
             var fieldCache = this.cacheServerResponse[fieldName];
-            if (!fieldCache) {
-                return false;
+            if (fieldCache === undefined) {
+                return null;
             }
 
-            return fieldCache[fieldValue] || false
+            return fieldCache[fieldValue] || null
         },
 
         /**
-         * Метод уставливает оберные для в debounce метод setStatus для каждого поля модели
+         * Method returns debounce decorated method setStatus for each model field
          *
          * @method
          * @name RegistrationView#setStatusHandlers
@@ -168,15 +169,18 @@ define([
          * @returns {boolean}
          */
         checkCacheForError: function(formData) {
-            if (!formData) formData = {};
             return _.some(formData, function(fieldValue, fieldName) {
                 var cachedValidationResult = this.getResponseFromCache(Helpers.camel(fieldName), fieldValue);
+                if (cachedValidationResult === null) {
+                    return false;
+                }
+
                 return cachedValidationResult.status === 'error';
             }, this);
         },
 
         /**
-         * Метод обработчик клика на кнопке 'Зарегистрироваться'
+         * Submit handler
          *
          * @method
          * @name RegistrationView#userRegistrationHandler
@@ -191,11 +195,16 @@ define([
 
             event.preventDefault();
 
-            formData = Helpers.serializeForm(this.elements.registrationForm);
+            formData = Helpers.serializeForm(this.elements.registrationForm) || null;
+
+            if (formData === null) {
+                return;
+            }
+
             this.model.set(formData);
 
             errors = this.model.validate();
-            if (errors) {
+            if (errors !== undefined) {
                 this.showFieldsErrors(errors, true);
                 return;
             }
@@ -212,7 +221,7 @@ define([
         },
 
         /**
-         * Метод обработчик успешной регистрации пользователя
+         * Handler of successful registration
          *
          * @method
          * @name RegistrationView#userRegistrationSuccess
@@ -237,14 +246,14 @@ define([
          * @method
          * @name RegistrationView#parseResponseError
          * @param {Object} response
-         * @returns {Object | string}
+         * @returns {Object | null}
          */
         parseResponseError: function (response) {
             var error,
                 responseJSONError;
 
             if (!response) {
-                return '';
+                return null;
             }
 
             responseJSONError = response.responseJSON && response.responseJSON.error;
@@ -258,14 +267,14 @@ define([
                     error = error.error;
                 }
             }  catch(e) {
-                error = '';
+                error = null;
             }
 
             return error;
         },
 
         /**
-         * Метод обработчик неуспешной регистрации пользователя
+         * Handler of registration error
          *
          * @method
          * @name RegistrationView#userRegistrationFail
@@ -276,18 +285,16 @@ define([
         userRegistrationFail: function (model, response) {
             var error = this.parseResponseError(response);
 
-            if (typeof error === 'string') {
-                //TODO: добавить вывод системной ошибки
+            if (error === null) {
+                console.error('user registration fail');
                 return;
             }
 
-            if (typeof error === 'object') {
-                this.showFieldsErrors(error);
-            }
+            this.showFieldsErrors(error);
         },
 
         /**
-         * Метод обработчик получения фокуса полем
+         * Focus handler
          *
          * @method
          * @name RegistrationView#focusFormFieldHandler
@@ -311,7 +318,7 @@ define([
         },
 
         /**
-         * Метод обработчик события изменения поля формы
+         * Change handler
          *
          * @method
          * @name RegistrationView#changeFormFieldHandler
@@ -343,44 +350,19 @@ define([
         },
 
         /**
-         * Метод устанавливает статусы для полей success или error
+         * Requests server validation for given field
          *
-         * @param $field
+         * @method
          * @param serializedField
-         * @param needServerValidation
+         * @param fieldValue
+         * @param fieldName
+         * @param $field
+         * @returns {undefined}
          */
-        setStatus: function ($field, serializedField, needServerValidation) {
+        serverValidation: function(serializedField, fieldValue, fieldName, $field) {
             var model = this.model,
-                fieldValue = serializedField.value,
-                fieldName = serializedField.name,
                 error,
-                cachedValidationResult,
-                self;
-
-            if (fieldValue !== model.get(fieldName)) {
-                return;
-            }
-
-            cachedValidationResult = this.getResponseFromCache(fieldName, fieldValue);
-            if (cachedValidationResult) {
-                $field.controlStatus(cachedValidationResult.status, cachedValidationResult.message);
-                return;
-            }
-
-            error = model.preValidate(fieldName, fieldValue);
-
-            if (error) {
-                error = Helpers.i18n(error);
-                $field.controlStatus('error', error);
-                return;
-            }
-
-            if (!needServerValidation) {
-                $field.controlStatus('success');
-                return;
-            }
-
-            self = this;
+                self = this;
 
             model.validateFieldByServer(serializedField).done(function () {
                 //В случае, если поле пока шел ответ уже изменилось
@@ -411,6 +393,45 @@ define([
         },
 
         /**
+         * Method sets status success or error
+         *
+         * @param $field
+         * @param serializedField
+         * @param needServerValidation
+         */
+        setStatus: function ($field, serializedField, needServerValidation) {
+            var model = this.model,
+                fieldValue = serializedField.value,
+                fieldName = serializedField.name,
+                error,
+                cachedValidationResult;
+
+            if (fieldValue !== model.get(fieldName)) {
+                return;
+            }
+
+            cachedValidationResult = this.getResponseFromCache(fieldName, fieldValue);
+            if (cachedValidationResult !== null) {
+                $field.controlStatus(cachedValidationResult.status, cachedValidationResult.message);
+                return;
+            }
+
+            error = model.preValidate(fieldName, fieldValue);
+            if (!_.isEmpty(error)) {
+                error = Helpers.i18n(error);
+                $field.controlStatus('error', error);
+                return;
+            }
+
+            if (!needServerValidation) {
+                $field.controlStatus('success');
+                return;
+            }
+
+            this.serverValidation(serializedField, fieldValue, fieldName, $field);
+        },
+
+        /**
          * @method
          * @name RegistrationView#serialize
          * @returns {Object}
@@ -423,8 +444,7 @@ define([
         },
 
         /**
-         * Метод показывает список ошибок у
-         * переданных полей
+         * Method shows errors list for given fields
          *
          * @method
          * @name RegistrationView#showFieldsErrors
@@ -446,7 +466,7 @@ define([
         },
 
         /**
-         * Метод устанавливает всплывающие подсказоки у полей
+         * Methods shows helpers for fields
          *
          * @method
          * @name RegistrationView#setFieldsHelpers
@@ -468,7 +488,7 @@ define([
         },
 
         /**
-         * Метод сохраняет ссылки на элементы DOM
+         * Methods cached DOM elements
          *
          * @method
          * @name RegistrationView#setElements
