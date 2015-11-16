@@ -117,6 +117,27 @@ define([
         },
 
         /**
+         * Gets validation error for formData
+         *
+         * @method
+         * @name Helpers#getValidationError
+         * @param formData
+         * @param model
+         * @returns {Object || null}
+         */
+        getValidationError: function(formData, model) {
+            var validationError = _.reduce(formData, function(errors, fieldValue, fieldName) {
+                var fieldError = model.preValidate(fieldName, fieldValue);
+                if (!_.isEmpty(fieldError)) {
+                    errors[fieldName] = fieldError;
+                }
+                return errors;
+            }, {}, this);
+
+            return _.isEmpty(validationError)? null: validationError;
+        },
+
+        /**
          * Метод возвращает сериализованный инпут
          *
          * @public
