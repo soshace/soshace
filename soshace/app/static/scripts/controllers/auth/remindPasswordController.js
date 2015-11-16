@@ -8,12 +8,12 @@
 define([
         'backbone',
         'utils/controller',
-        'models/auth/remindPasswordModel',
+        'models/usersModel',
         'views/auth/remindPasswordView',
         'utils/helpers',
         'config'
     ],
-    function (Backbone, Controller, RemindPasswordModel, RemindPasswordView, Helpers) {
+    function (Backbone, Controller, UsersModel, RemindPasswordView, Helpers) {
         return Controller.extend({
             /**
              * Алиас страницы
@@ -27,7 +27,7 @@ define([
             /**
              * @field
              * @name RemindPasswordController#model
-             * @type {RemindPasswordModel | null}
+             * @type {UsersModel | null}
              */
             model: null,
 
@@ -44,7 +44,7 @@ define([
              * @returns {undefined}
              */
             initialize: function () {
-                this.model = new RemindPasswordModel();
+                this.model = new UsersModel();
                 this.view = new RemindPasswordView({
                     model: this.model
                 });
