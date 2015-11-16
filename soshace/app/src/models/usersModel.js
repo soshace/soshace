@@ -593,7 +593,8 @@ UsersShema.statics.confirmEmail = function (code, callback) {
  * @method
  * @name UsersShema.updatePassword
  * @param {String} userId
- * @param {Function} password
+ * @param {String} password
+ * @param {Function} callback
  * @return {undefined}
  */
 
@@ -619,7 +620,7 @@ UsersShema.statics.findOneAndUpdatePassword = function (userId, password, callba
                 return;
             }
             self.update({_id: userId}, {password: hash}, function (error, user) {
-                useCallback && callback(serverIsBusyError, user);
+                useCallback && callback(null, user);
             });
         });
     });
