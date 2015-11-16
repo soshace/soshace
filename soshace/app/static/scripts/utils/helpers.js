@@ -65,7 +65,7 @@ define([
          * Method parses error from server response
          *
          * @method
-         * @name RegistrationView#parseResponseError
+         * @name Helpers#parseResponseError
          * @param {Object} response
          * @returns {Object | null}
          */
@@ -92,6 +92,28 @@ define([
             }
 
             return error;
+        },
+
+        /**
+         * Method shows errors list in specified fields
+         *
+         * @method
+         * @name Helpers#showFieldsErrors
+         * @param {Object} errors list of errors
+         * @param {boolean} translate
+         * @returns {undefined}
+         */
+        showFieldsErrors: function (errors, translate) {
+            _.each(errors, _.bind(function (error, fieldName) {
+                var $field;
+
+                fieldName = this.hyphen(fieldName);
+                $field = $('#' + fieldName);
+                if (translate) {
+                    error = this.i18n(error);
+                }
+                $field.controlStatus('error', error);
+            }, this));
         },
 
         /**
