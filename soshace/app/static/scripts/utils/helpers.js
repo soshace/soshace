@@ -15,7 +15,7 @@ define([
 ], function ($, _) {
     return {
         /**
-         * Метод приводит строки типа hyp-hen к виду camelCase
+         * hyp-hen string to camelCase
          *
          * @public
          * @method
@@ -28,7 +28,7 @@ define([
         },
 
         /**
-         * Метод приводит строки типа camelCase к виду hyp-hen
+         * camelCase string to hyp-hen
          *
          * @public
          * @method
@@ -38,24 +38,6 @@ define([
          */
         hyphen: function (value) {
             return value.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-        },
-
-        /**
-         * Method makes converts hypen strings to camelCase
-         *
-         * @public
-         * @method
-         * @name Helpers.camel
-         * @param {String} value
-         * @returns {String}
-         */
-        camel: function(value) {
-            if (!value || typeof value.replace !== 'function') {
-                return value;
-            }
-            return value.replace(/-([a-z])/g, function (g) {
-                return g[1].toUpperCase();
-            });
         },
 
         /**

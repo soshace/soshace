@@ -170,7 +170,7 @@ define([
          */
         checkCacheForError: function(formData) {
             return _.some(formData, function(fieldValue, fieldName) {
-                var cachedValidationResult = this.getResponseFromCache(Helpers.camel(fieldName), fieldValue);
+                var cachedValidationResult = this.getResponseFromCache(Helpers.camelCase(fieldName), fieldValue);
                 if (cachedValidationResult === null) {
                     return false;
                 }
