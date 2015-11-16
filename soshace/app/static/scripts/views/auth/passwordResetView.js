@@ -91,8 +91,8 @@ define([
 
             this.model.set(formData);
 
-             errors = this.model.validate();
-            if (errors) {
+            errors = this.model.validate();
+            if (errors !== undefined) {
                 return errors;
             }
 
