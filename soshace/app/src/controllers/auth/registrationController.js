@@ -160,7 +160,7 @@ module.exports = Controller.extend({
     },
 
     /**
-     * Метод создает пользователя в базе
+     * Method creates user in db
      *
      * @method
      * @name RegistrationController#createUser
@@ -171,7 +171,7 @@ module.exports = Controller.extend({
             userData = request.body,
             user;
 
-        if (!userData) {
+        if (_.isEmpty(userData)) {
             this.sendError('Bad request');
             return;
         }
