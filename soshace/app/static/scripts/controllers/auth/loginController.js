@@ -26,7 +26,7 @@ define([
             /**
              * @field
              * @name LoginController#model
-             * @type {LoginModel}
+             * @type {UsersModel}
              */
             model: null,
 
