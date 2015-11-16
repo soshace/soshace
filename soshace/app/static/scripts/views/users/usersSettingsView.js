@@ -186,51 +186,26 @@ define([
          */
         submitHandler: function (event) {
             var formData = this.getFormData(),
-                errors = this.getFormError(formData),
-                self;
+                errors = this.getFormError(formData);
 
             event.preventDefault();
 
             this.elements.validateFields.controlStatus('base');
 
             if (errors !== null) {
-                this.showFieldsErrors(errors, false);
+                Helpers.showFieldsErrors(errors, false);
                 return;
             }
 
-            self = this;
-
             this.model.updatePassword(formData.password, formData.newPassword, function(error) {
                 if (error) {
-                    self.showFieldsErrors(error.error);
+                    Helpers.showFieldsErrors(error.error, false);
                     return;
                 }
 
                 // TODO: show success message
                 alert('password changed!');
             });
-        },
-
-        /**
-         * Method shows errors list in specified fields
-         *
-         * @method
-         * @name UsersSettingsView#showFieldsErrors
-         * @param {Object} errors list of errors
-         * @param {boolean} translate
-         * @returns {undefined}
-         */
-        showFieldsErrors: function (errors, translate) {
-            _.each(errors, _.bind(function (error, fieldName) {
-                var $field;
-
-                fieldName = Helpers.hyphen(fieldName);
-                $field = $('#' + fieldName);
-                if (translate) {
-                    error = Helpers.i18n(error);
-                }
-                $field.controlStatus('error', error);
-            }, this));
         },
 
         /**

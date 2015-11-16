@@ -124,7 +124,7 @@ define([
 
             errors = this.setFieldDataAndGetInputErrors(formData);
             if (errors) {
-                this.showFieldsErrors(errors);
+                Helpers.showFieldsErrors(errors, true);
                 return;
             }
 
@@ -132,26 +132,6 @@ define([
                 success: _this.resetPasswordSuccess,
                 error: _this.resetPasswordFail
             });
-        },
-
-        /**
-         * Метод показывает список ошибок у
-         * переданных полей
-         *
-         * @method
-         * @name LoginView#showFieldsErrors
-         * @param {Object} errors список ошибок
-         * @returns {undefined}
-         */
-        showFieldsErrors: function (errors) {
-            _.each(errors, _.bind(function (error, fieldName) {
-                var $field;
-
-                fieldName = Helpers.hyphen(fieldName);
-                $field = $('#' + fieldName);
-                error = Helpers.i18n(error);
-                $field.controlStatus('error', error);
-            }, this));
         },
 
         /**
@@ -176,7 +156,7 @@ define([
         },
 
         /**
-         * Метод обработчик неуспешного логина пользователя
+         * Method handler of submit fail
          *
          * @method
          * @name LoginView#userLoginFail
@@ -194,7 +174,7 @@ define([
             }
 
             if (typeof error === 'object') {
-                this.showFieldsErrors(error);
+                Helpers.showFieldsErrors(error, true);
             }
         },
 

@@ -205,7 +205,7 @@ define([
 
             errors = this.model.validate();
             if (errors !== undefined) {
-                this.showFieldsErrors(errors, true);
+                Helpers.showFieldsErrors(errors, true);
                 return;
             }
 
@@ -257,7 +257,7 @@ define([
                 return;
             }
 
-            this.showFieldsErrors(error);
+            Helpers.showFieldsErrors(error, false);
         },
 
         /**
@@ -408,28 +408,6 @@ define([
 
             data.isRegistrationTab = true;
             return data;
-        },
-
-        /**
-         * Method shows errors list for given fields
-         *
-         * @method
-         * @name RegistrationView#showFieldsErrors
-         * @param {Object} errors список ошибок
-         * @param {Boolean} [translate] true - перевести ошибки
-         * @returns {undefined}
-         */
-        showFieldsErrors: function (errors, translate) {
-            _.each(errors, _.bind(function (error, fieldName) {
-                var $field;
-
-                fieldName = Helpers.hyphen(fieldName);
-                $field = $('#' + fieldName);
-                if (translate) {
-                    error = Helpers.i18n(error);
-                }
-                $field.controlStatus('error', error);
-            }, this));
         },
 
         /**

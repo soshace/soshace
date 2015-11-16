@@ -89,7 +89,7 @@ define([
             errors = this.model.validate();
 
             if (errors) {
-                this.showFieldsErrors(errors, true);
+                Helpers.showFieldsErrors(errors, true);
                 return;
             }
 
@@ -129,30 +129,7 @@ define([
                 return;
             }
 
-            this.showFieldsErrors(error);
-        },
-
-        /**
-         * Метод показывает список ошибок у
-         * переданных полей
-         *
-         * @method
-         * @name RemindPasswordView#showFieldsErrors
-         * @param {Object} errors список ошибок
-         * @param {Boolean} [translate] true - перевести ошибки
-         * @returns {undefined}
-         */
-        showFieldsErrors: function (errors, translate) {
-            _.each(errors, _.bind(function (error, fieldName) {
-                var $field;
-
-                fieldName = Helpers.hyphen(fieldName);
-                $field = $('#' + fieldName);
-                if (translate) {
-                    error = Helpers.i18n(error);
-                }
-                $field.controlStatus('error', error);
-            }, this));
+            Helpers.showFieldsErrors(error, false);
         },
 
         /**

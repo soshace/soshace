@@ -82,7 +82,7 @@ define([
         },
 
         /**
-         * Метод обработчик клика на кнопке 'Войти'
+         * Login submit handler
          *
          * @method
          * @name LoginView#userLoginHandler
@@ -101,7 +101,7 @@ define([
             errors = this.model.validate();
 
             if (errors) {
-                this.showFieldsErrors(errors);
+                Helpers.showFieldsErrors(errors, true);
                 return;
             }
 
@@ -113,26 +113,6 @@ define([
 
                 _this.userLoginSuccess(model);
             });
-        },
-
-        /**
-         * Метод показывает список ошибок у
-         * переданных полей
-         *
-         * @method
-         * @name LoginView#showFieldsErrors
-         * @param {Object} errors список ошибок
-         * @returns {undefined}
-         */
-        showFieldsErrors: function (errors) {
-            _.each(errors, _.bind(function (error, fieldName) {
-                var $field;
-
-                fieldName = Helpers.hyphen(fieldName);
-                $field = $('#' + fieldName);
-                error = Helpers.i18n(error);
-                $field.controlStatus('error', error);
-            }, this));
         },
 
         /**
@@ -173,7 +153,7 @@ define([
             }
 
             if (typeof error === 'object') {
-                this.showFieldsErrors(error);
+                Helpers.showFieldsErrors(error, true);
             }
         },
 
