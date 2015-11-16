@@ -127,7 +127,7 @@ define([
         },
 
         /**
-         * Метод возвращает сериализованную форму
+         * Method returns serialized form
          *
          * @method
          * @name UsersSettingsView#getFormData
@@ -153,17 +153,14 @@ define([
          * @method
          * @name UsersSettingsView#getFormError
          * @param formData
-         * @returns {*}
+         * @returns {Object || null}
          */
         getFormError: function(formData) {
             var error,
-                passwordsMatch
-                ;
-
-            if (!formData) formData = {};
+                passwordsMatch;
 
             error = this.model.preValidate('password', formData.newPassword);
-            if (error) {
+            if (!_.isEmpty(error)) {
                 return {
                     newPassword: error
                 };
@@ -176,7 +173,7 @@ define([
                 };
             }
 
-            return false;
+            return null;
         },
 
         /**
@@ -196,15 +193,16 @@ define([
 
             this.elements.validateFields.controlStatus('base');
 
-            if (errors) {
-                this.showFieldsErrors(errors);
+            if (errors !== null) {
+                this.showFieldsErrors(errors, false);
                 return;
             }
 
             self = this;
-            this.model.updatePassword(formData.password, formData.newPassword, function(err) {
-                if (err) {
-                    self.showFieldsErrors(err.error);
+
+            this.model.updatePassword(formData.password, formData.newPassword, function(error) {
+                if (error) {
+                    self.showFieldsErrors(error.error);
                     return;
                 }
 
@@ -219,6 +217,7 @@ define([
          * @method
          * @name UsersSettingsView#showFieldsErrors
          * @param {Object} errors list of errors
+         * @param {boolean} translate
          * @returns {undefined}
          */
         showFieldsErrors: function (errors, translate) {
