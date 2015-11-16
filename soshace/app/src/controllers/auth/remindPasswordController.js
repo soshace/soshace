@@ -139,17 +139,47 @@ module.exports = Controller.extend({
         });
     },
 
-    findUserHandler: function(error, user, userId, password, oldPassword) {
-        var self = this,
-            response = this.response;
-
+    /**
+     * Method handles find user error and returns flag to determine if error occurred
+     *
+     * @method
+     * @name RemindPasswordController#checkFindUserError
+     * @param error
+     * @param user
+     * @returns {boolean}
+     */
+    checkFindUserError: function(error, user) {
         if (error) {
             this.sendError('Server is too busy, try later', 503);
-            return;
+            return true;
         }
 
-        if (!user) {
+        if (user === null) {
             this.renderError('User not found', 404);
+            return true;
+        }
+
+        return false;
+    },
+
+    /**
+     * Method checks old password and updates password to new if old one is correct
+     *
+     * @method
+     * @name RemindPasswordController#findUserHandler
+     * @param error
+     * @param user
+     * @param userId
+     * @param password
+     * @param oldPassword
+     * @returns {undefined}
+     */
+    findUserHandler: function(error, user, userId, password, oldPassword) {
+        var self = this,
+            response = this.response,
+            findUserError = this.checkFindUserError(error, user);
+
+        if (findUserError) {
             return;
         }
 
@@ -253,15 +283,9 @@ module.exports = Controller.extend({
             return;
         }
 
-        UsersModel.findOne({email: emailValue}, function(err, user) {
-            if (err) {
-                console.error(err);
-                self.sendError(err);
-                return;
-            }
-
-            if (!user) {
-                self.sendError('User not found', 400);
+        UsersModel.findOne({email: emailValue}, function(error, user) {
+            var findUserError = self.checkFindUserError(error, user);
+            if (findUserError) {
                 return;
             }
 
