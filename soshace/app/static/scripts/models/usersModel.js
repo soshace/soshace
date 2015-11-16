@@ -226,10 +226,10 @@ define([
          * @method
          * @name UsersModel#login
          * @param loginData
-         * @param callback
+         * @param callbacks
          * @returns {undefined}
          */
-        login: function(loginData, callback) {
+        login: function(loginData, callbacks) {
             $.ajax({
                 type: "POST",
                 url: Soshace.urls.api.login,
@@ -238,12 +238,8 @@ define([
                     'Content-Type': 'application/json'
                 },
                 data: JSON.stringify(loginData),
-                success: function (model) {
-                    callback(null, model);
-                },
-                error: function (response) {
-                    callback(response);
-                }
+                success: callbacks.success,
+                error: callbacks.error
             });
         },
 
@@ -275,10 +271,10 @@ define([
          * @method
          * @param {String} oldPassword
          * @param {String} password
-         * @param {Function} callback
+         * @param {Function} callbacks
          * @returns {undefined}
          */
-        updatePassword: function (oldPassword, password, callback) {
+        updatePassword: function (oldPassword, password, callbacks) {
             $.ajax({
                 type: "POST",
                 url: Soshace.urls.api.updatePassword,
@@ -290,13 +286,31 @@ define([
                     password: password,
                     oldPassword: oldPassword
                 }),
-                success: function () {
-                    callback();
+                success: callbacks.success,
+                error: callbacks.error
+            });
+        },
+
+        /**
+         * Sends request to server to reset password
+         *
+         * @method
+         * @name UsersModel#resetPassword
+         * @param resetPasswordData
+         * @param callbacks
+         * @returns {undefined}
+         */
+        resetPassword: function(resetPasswordData, callbacks) {
+            $.ajax({
+                type: "POST",
+                url: Soshace.urls.api.resetPassword,
+                dataType: 'json',
+                headers: {
+                    'Content-Type': 'application/json'
                 },
-                error: function (response) {
-                    // TODO: handle response error
-                    callback(JSON.parse(response.responseText));
-                }
+                data: JSON.stringify(resetPasswordData),
+                success: callbacks.success,
+                error: callbacks.error
             });
         },
 
@@ -315,6 +329,31 @@ define([
             params[name] = serializedField.value;
             // use post for security
             return $.post(Soshace.urls.api.registration.validateField, params);
+        },
+
+        /**
+         * Sends request to remind password
+         *
+         * @method
+         * @name Usersmodel@remindPassword
+         * @param emailValue
+         * @param callbacks
+         * @returns {undefined}
+         */
+        remindPassword: function(emailValue, callbacks) {
+            $.ajax({
+                type: "POST",
+                url: Soshace.urls.api.remindPassword.send,
+                dataType: 'json',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify({
+                    email: emailValue
+                }),
+                success: callbacks.success,
+                error: callbacks.error
+            });
         },
 
         /**
