@@ -189,7 +189,9 @@ module.exports = Controller.extend({
      * @returns {Object}
      */
     formatErrorsFromDB: function(errors) {
-        if (!errors) errors = {};
+        if (errors === null) {
+            errors = {};
+        }
         return _.reduce(errors, function(formattedErrors, error, fieldName) {
             formattedErrors[fieldName] = error && error.message;
             return formattedErrors;
@@ -197,7 +199,7 @@ module.exports = Controller.extend({
     },
 
     /**
-     * Метод обработчик сохранения пользователя в модели
+     * User save success handler
      *
      * @method
      * @name RegistrationController#userSaveHandler
