@@ -139,6 +139,32 @@ module.exports = Controller.extend({
         });
     },
 
+    findUserHandler: function(error, user, userId, password, oldPassword) {
+        var self = this,
+            response = this.response;
+
+        if (error) {
+            this.sendError('Server is too busy, try later', 503);
+            return;
+        }
+
+        if (!user) {
+            this.renderError('User not found', 404);
+            return;
+        }
+
+        user.comparePassword(oldPassword, function(error) {
+            if (error) {
+                self.sendError(error);
+                return;
+            }
+
+            UsersModel.findOneAndUpdatePassword(userId, password, function() {
+                response.end();
+            });
+        });
+    },
+
     /**
      * Updates a password
      *
@@ -150,15 +176,13 @@ module.exports = Controller.extend({
 
     updatePassword: function () {
         var request = this.request,
-            response = this.response,
             body = request.body,
             params = new RequestParams(request),
             userId = params.profile.id,
             password = body.password,
             oldPassword = body.oldPassword,
-            self = this,
-            newPasswordValidationError
-            ;
+            newPasswordValidationError,
+            self = this;
 
         if (!oldPassword) {
             this.sendError('Bad request', 400);
@@ -171,31 +195,9 @@ module.exports = Controller.extend({
             return;
         }
 
-        UsersModel.findOne({_id: new ObjectId(userId)}, function (error, user) {
-
-            if (error) {
-                self.sendError('Server is too busy, try later', 503);
-                return;
-            }
-
-            if (!user) {
-                self.renderError('User not found', 404);
-                return;
-            }
-
-            user.comparePassword(body.oldPassword, function(err) {
-                if (err) {
-                    self.sendError(err);
-                    return;
-                }
-
-                UsersModel.findOneAndUpdatePassword(userId, password, function() {
-                    response.end();
-                });
-
-            });
+        UsersModel.findOne({_id: new ObjectId(userId)}, function(error, user) {
+            self.findUserHandler(error, user, userId, password, oldPassword);
         });
-
     },
 
     /**
