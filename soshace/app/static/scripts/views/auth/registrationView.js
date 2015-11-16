@@ -241,39 +241,6 @@ define([
         },
 
         /**
-         * Method parses error from server response
-         *
-         * @method
-         * @name RegistrationView#parseResponseError
-         * @param {Object} response
-         * @returns {Object | null}
-         */
-        parseResponseError: function (response) {
-            var error,
-                responseJSONError;
-
-            if (!response) {
-                return null;
-            }
-
-            responseJSONError = response.responseJSON && response.responseJSON.error;
-            if (responseJSONError) {
-                return responseJSONError;
-            }
-
-            try {
-                error = JSON.parse(response.responseText);
-                if (error.error) {
-                    error = error.error;
-                }
-            }  catch(e) {
-                error = null;
-            }
-
-            return error;
-        },
-
-        /**
          * Handler of registration error
          *
          * @method
@@ -283,7 +250,7 @@ define([
          * @returns {undefined}
          */
         userRegistrationFail: function (model, response) {
-            var error = this.parseResponseError(response);
+            var error = Helpers.parseResponseError(response);
 
             if (error === null) {
                 console.error('user registration fail');

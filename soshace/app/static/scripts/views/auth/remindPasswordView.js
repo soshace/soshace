@@ -70,7 +70,7 @@ define([
         },
 
         /**
-         * Метод обработчик клика на кнопке 'Восстановить пароль'
+         * Form submit handler
          *
          * @method
          * @name RemindPasswordView#submitHandler
@@ -100,41 +100,7 @@ define([
         },
 
         /**
-         * Method parses response error from server
-         *
-         * @method
-         * @name RemindPasswordView#parseResponseError
-         * @param response
-         * @returns {*}
-         */
-        parseResponseError: function (response) {
-            // TODO: move this method to utils
-            var error,
-                responseJSONError;
-
-            if (!response) {
-                return '';
-            }
-
-            responseJSONError = response.responseJSON && response.responseJSON.error;
-            if (responseJSONError) {
-                return responseJSONError;
-            }
-
-            try {
-                error = JSON.parse(response.responseText);
-                if (error.error) {
-                    error = error.error;
-                }
-            }  catch(e) {
-                error = '';
-            }
-
-            return error;
-        },
-
-        /**
-         * Метод обработчик успешной отправки интсрукции на почтовый ящик
+         * Submit success handler
          *
          * @method
          * @name RemindPasswordView#submitSuccessHandler
@@ -147,7 +113,7 @@ define([
         },
 
         /**
-         * Метод обработчик неуспешной отправки интрукции на почтовый ящик
+         * Submit error handler
          *
          * @method
          * @name RemindPasswordView#submitFailHandler
@@ -156,16 +122,14 @@ define([
          * @returns {undefined}
          */
         submitFailHandler: function (model, response) {
-            var error = this.parseResponseError(response);
+            var error = Helpers.parseResponseError(response);
 
-            if (typeof error === 'string') {
-                //TODO: добавить вывод системной ошибки
+            if (error === null) {
+                console.error('remind password fail');
                 return;
             }
 
-            if (typeof error === 'object') {
-                this.showFieldsErrors(error);
-            }
+            this.showFieldsErrors(error);
         },
 
         /**

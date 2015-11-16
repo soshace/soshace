@@ -62,6 +62,39 @@ define([
         },
 
         /**
+         * Method parses error from server response
+         *
+         * @method
+         * @name RegistrationView#parseResponseError
+         * @param {Object} response
+         * @returns {Object | null}
+         */
+        parseResponseError: function (response) {
+            var error,
+                responseJSONError;
+
+            if (!response) {
+                return null;
+            }
+
+            responseJSONError = response.responseJSON && response.responseJSON.error;
+            if (responseJSONError) {
+                return responseJSONError;
+            }
+
+            try {
+                error = JSON.parse(response.responseText);
+                if (error.error) {
+                    error = error.error;
+                }
+            }  catch(e) {
+                error = null;
+            }
+
+            return error;
+        },
+
+        /**
          * Метод возвращает сериализованный инпут
          *
          * @public
