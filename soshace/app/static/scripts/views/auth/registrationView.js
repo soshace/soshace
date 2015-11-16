@@ -153,9 +153,10 @@ define([
          * @returns {undefined}
          */
         setStatusHandlers: function () {
-            var model = this.model.toJSON();
+            var registrationData = this.model.getRegistrationData();
+            delete registrationData.locale;
 
-            _.each(model, _.bind(function (fieldValue, fieldName) {
+            _.each(registrationData, _.bind(function (fieldValue, fieldName) {
                 this.statusDebounceHandlers[fieldName] = _.debounce(_.bind(this.setStatus, this), 500);
             }, this));
         },
@@ -214,7 +215,7 @@ define([
                 return;
             }
 
-            this.model.save(null, {
+            this.model.register({
                 success: _this.userRegistrationSuccess,
                 error: _this.userRegistrationFail
             });
@@ -225,11 +226,10 @@ define([
          *
          * @method
          * @name RegistrationView#userRegistrationSuccess
-         * @param {Backbone.Model} model
          * @param {Object} response
          * @returns {undefined}
          */
-        userRegistrationSuccess: function (model, response) {
+        userRegistrationSuccess: function (response) {
             var app = Soshace.app,
                 redirectUrl = response.redirect;
 
@@ -245,11 +245,10 @@ define([
          *
          * @method
          * @name RegistrationView#userRegistrationFail
-         * @param {Backbone.Model} model
          * @param {Object} response
          * @returns {undefined}
          */
-        userRegistrationFail: function (model, response) {
+        userRegistrationFail: function (response) {
             var error = Helpers.parseResponseError(response);
 
             if (error === null) {
@@ -313,7 +312,10 @@ define([
             model.set(fieldName, fieldValue);
             $target.controlStatus('helper');
             setStatusHandler = this.statusDebounceHandlers[fieldName];
-            setStatusHandler($target, serializedField, needServerValidation);
+
+            if (typeof setStatusHandler === 'function') {
+                setStatusHandler($target, serializedField, needServerValidation);
+            }
         },
 
         /**
@@ -421,7 +423,7 @@ define([
         setFieldsHelpers: function (helpers) {
             _.each(helpers, _.bind(function (helper, fieldName) {
                 var $field,
-                    successTitle = this.model.successMessages[fieldName];
+                    successTitle = this.model.registrationFormText.successMessages[fieldName];
 
                 fieldName = Helpers.hyphen(fieldName);
                 $field = $('#' + fieldName);
@@ -450,7 +452,7 @@ define([
          */
         afterRender: function () {
             this.setElements();
-            this.setFieldsHelpers(this.model.helpers);
+            this.setFieldsHelpers(this.model.registrationFormText.helpers);
             //Используется асинхронный вызов, чтобы навесились обработчики событий
             setTimeout(function () {
                 $('#user-name').focus();

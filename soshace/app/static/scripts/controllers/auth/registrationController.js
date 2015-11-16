@@ -8,12 +8,12 @@
 define([
     'backbone',
     'utils/controller',
-    'models/auth/registrationModel',
+    'models/usersModel',
     'views/auth/registrationView',
     'utils/helpers',
     'config'
 ],
-    function (Backbone, Controller, RegistrationModel, RegistrationView, Helpers) {
+    function (Backbone, Controller, UsersModel, RegistrationView, Helpers) {
         return Controller.extend({
             /**
              * Алиас страницы
@@ -27,7 +27,7 @@ define([
             /**
              * @field
              * @name RegistrationController#model
-             * @type {RegistrationModel}
+             * @type {UsersModel}
              */
             model: null,
 
@@ -44,7 +44,7 @@ define([
              * @returns {undefined}
              */
             initialize: function () {
-                this.model = new RegistrationModel();
+                this.model = new UsersModel();
                 this.view = new RegistrationView({
                     model: this.model
                 });

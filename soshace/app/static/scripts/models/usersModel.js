@@ -47,7 +47,9 @@ define([
             birthdayDate: null,
             birthdayMonth: null,
             birthdayFullYear: null,
-            aboutAuthor: null
+            aboutAuthor: null,
+            email: null,
+            password: null
         },
 
         /**
@@ -87,6 +89,19 @@ define([
             }
         ],
 
+        registrationFormText: {
+            helpers: {
+                userName: 'Use the Latin alphabet, numbers, &#34;.&#34;, &#34;_&#34;, &#34;-&#34;.',
+                email: 'Please enter your e-mail address.',
+                password: 'Use the numbers, upper-and lowercase letters, symbols'
+            },
+            successMessages: {
+                userName: 'Great username!',
+                email: 'Great email!',
+                password: 'Great password!'
+            }
+        },
+
         validation: {
             email: [
                 {
@@ -107,11 +122,59 @@ define([
                     minLength: 6,
                     msg: 'Password length should&#39;t be less than 6 characters.'
                 }
+            ],
+            userName: [
+                {
+                    required: true,
+                    msg: 'Username can&#39;t be blank.'
+                },
+                {
+                    userName: 1
+                }
             ]
         },
 
         /**
-         * Метод возвращает true, если информация по прфилю пустая
+         * Gets fields needed for registration from model to reduce traffic
+         * server don't need whole model
+         *
+         * @method
+         * @name UsersModel#getRegistrationData
+         * @returns {Object}
+         */
+        getRegistrationData: function() {
+            return {
+                locale: this.get('locale'),
+                email: this.get('email'),
+                password: this.get('password'),
+                userName: this.get('userName')
+            };
+        },
+
+        /**
+         * Sends request to register user
+         *
+         * @method
+         * @name UsersModel#register
+         * @param callbacks
+         * @returns {undefined}
+         */
+        register: function(callbacks) {
+            $.ajax({
+                type: "POST",
+                url: Soshace.urls.api.createUser,
+                dataType: 'json',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify(this.getRegistrationData()),
+                success: callbacks.success,
+                error: callbacks.error
+            });
+        },
+
+        /**
+         * Method returns true if profile is empty
          *
          * @method
          * @name UsersModel#isProfileInfoEmpty
@@ -133,7 +196,7 @@ define([
         },
 
         /**
-         * Метод загружает данные пользователя
+         * Method loads user's data
          *
          * @method
          * @name UsersModel#getUser
@@ -157,6 +220,15 @@ define([
             return this.fetch();
         },
 
+        /**
+         * Sends request to login user
+         *
+         * @method
+         * @name UsersModel#login
+         * @param loginData
+         * @param callback
+         * @returns {undefined}
+         */
         login: function(loginData, callback) {
             $.ajax({
                 type: "POST",
@@ -170,8 +242,7 @@ define([
                     callback(null, model);
                 },
                 error: function (response) {
-                    // TODO: move parse server error method to utils and use it or at least add check for json parse
-                    callback(JSON.parse(response.responseText).error);
+                    callback(response);
                 }
             });
         },
@@ -227,6 +298,23 @@ define([
                     callback(JSON.parse(response.responseText));
                 }
             });
+        },
+
+        /**
+         * Method sends request to validate field by server
+         *
+         * @method
+         * @name UsersModel#validation
+         * @param {Object} serializedField
+         * @returns {jQuery.Deferred}
+         */
+        validateFieldByServer: function (serializedField) {
+            var params = {},
+                name = serializedField.name;
+
+            params[name] = serializedField.value;
+            // use post for security
+            return $.post(Soshace.urls.api.registration.validateField, params);
         },
 
         /**
