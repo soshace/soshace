@@ -94,17 +94,6 @@ define([
         },
 
         /**
-         * Метод возвращает True, если
-         *
-         * @method
-         * @name UsersSettingsView#isProfileEmpty
-         * @returns {Boolean}
-         */
-        isProfileEmpty: function(){
-
-        },
-
-        /**
          * @method
          * @name UsersSettingsView#serialize
          * @returns {Object}
