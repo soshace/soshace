@@ -7,7 +7,7 @@
 	"First Name Last Name": "First Name Last Name",
 	"Sex": "Sex",
 	"Birthday": "Birthday",
-	"Inforfomation obout author": "Inforfomation obout author",
+	"Information about author": "Information about author",
 	"Hobbies": "Hobbies",
 	"Add post": "Add post",
 	"Here could be your posts": "Here could be your posts",
@@ -16,7 +16,7 @@
 	"Author information": "Author information",
 	"Edit profile": "Edit profile",
 	"Settings": "Settings",
-	"Old Password": "Old Password",
+	"Old password": "Old password",
 	"New Password": "New Password",
 	"Confirm password": "Confirm password",
 	"Reset": "Reset",
@@ -29,5 +29,8 @@
 	"Female": "Female",
 	"About myself": "About myself",
 	"Save": "Save",
-	"Page not found": "Page not found"
+	"Page not found": "Page not found",
+	"Passwords don&#39;t match": "Passwords don&#39;t match",
+	"Check your email to change password": "Check your email to change password",
+	"Password change success": "Password change success"
 }

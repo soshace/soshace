@@ -207,9 +207,12 @@
 	"Password repair": "Восстановить пароль",
 	"Password resetting message from Soshace blog": "Password resetting message from Soshace blog",
 	"To reset your password follow this link:": "To reset your password follow this link:",
-	"Confirm password": "Confirm password",
+	"Confirm password": "Подтверждение пароля",
 	"Reset": "Reset",
-	"Old Password": "Old Password",
-	"New Password": "New Password",
-	"Change": "Change"
+	"Old password": "Старый пароль",
+	"New Password": "Новый пароль",
+	"Change": "Изменить",
+	"Passwords don&#39;t match": "Пароли не совпадают",
+	"Check your email to change password": "На указанную почту выслано письмо для смены пароля",
+	"Password change success": "Пароль успешно изменен"
 }
