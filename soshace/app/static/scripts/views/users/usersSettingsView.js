@@ -184,10 +184,21 @@ define([
             return null;
         },
 
+        /**
+         * @method
+         * @name UsersSettingsView#updatePasswordSuccessHandler
+         * @returns {undefined}
+         */
         updatePasswordSuccessHandler: function() {
             alert('password changed!');
         },
 
+        /**
+         * @method
+         * @name UsersSettingsView#updatePasswordErrorHandler
+         * @param response
+         * @returns {undefined}
+         */
         updatePasswordErrorHandler: function(response) {
             var error = Helpers.parseResponseError(response);
 
