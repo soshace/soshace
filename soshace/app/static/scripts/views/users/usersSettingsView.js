@@ -226,14 +226,16 @@ define([
         },
 
         /**
-         * Метод используется в тех случаях, когда шаблон уже отрендерен
-         * Но надо навесить слушатели и выполнить afterRender и т.д.
+         * Method is user when template is already rendered
+         * but we need to set event listeners and set DOM elements
          *
          * @method
          * @name UsersSettingsView#withoutRender
+         * @param $el
          * @returns {undefined}
          */
-        withoutRender: function () {
+        withoutRender: function ($el) {
+            this.$el = $el;
             this.delegateEvents();
             this.afterRender();
         },
