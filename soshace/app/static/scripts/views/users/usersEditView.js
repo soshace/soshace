@@ -134,22 +134,6 @@ define([
         },
 
         /**
-         * Метод возвращает сериализованную форму
-         *
-         * @method
-         * @name UsersEditView#getFormData
-         * @returns {Object}
-         */
-        getFormData: function () {
-            var $form = this.elements.form,
-                serializedForm = $form.serializeArray();
-
-            return _.object(_.map(serializedForm, function (field) {
-                return [field.name, field.value];
-            }));
-        },
-
-        /**
          * Метод обработчик отправки формы
          *
          * @method
@@ -158,7 +142,7 @@ define([
          * @returns {undefined}
          */
         submitHandler: function (event) {
-            var formData = this.getFormData(),
+            var formData = Helpers.getFormData(this.elements.form),
                 diff;
 
             event.preventDefault();

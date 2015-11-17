@@ -203,6 +203,20 @@ define([
         },
 
         /**
+         * Method returns serialized form
+         *
+         * @method
+         * @name Helpers#getFormData
+         * @returns {Object}
+         */
+        getFormData: function ($form) {
+            var serializedForm = $form.serializeArray();
+            return _.object(_.map(serializedForm, function (field) {
+                return [field.name, field.value];
+            }));
+        },
+
+        /**
          * Метод вставляет в строку переменные из списка опций
          * Заменяет {{param}}
          *

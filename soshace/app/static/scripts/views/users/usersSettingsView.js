@@ -116,23 +116,6 @@ define([
         },
 
         /**
-         * Method returns serialized form
-         *
-         * @method
-         * @name UsersSettingsView#getFormData
-         * @returns {Object}
-         */
-        //ToDo: move to utils
-        getFormData: function () {
-            var $form = this.elements.form,
-                serializedForm = $form.serializeArray();
-
-            return _.object(_.map(serializedForm, function (field) {
-                return [field.name, field.value];
-            }));
-        },
-
-        /**
          * Method checks if input is valid
          *
          * It uses model prevalidation for new password and then
@@ -207,7 +190,7 @@ define([
          * @returns {*}
          */
         submitHandler: function (event) {
-            var formData = this.getFormData(),
+            var formData = Helpers.getFormData(this.elements.form),
                 errors = this.getFormError(formData);
 
             event.preventDefault();
