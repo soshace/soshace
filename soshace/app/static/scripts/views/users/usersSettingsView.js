@@ -179,7 +179,7 @@ define([
          * @returns {undefined}
          */
         updatePasswordSuccessHandler: function() {
-            alert('password changed!');
+            alert(Helpers.i18n('Password change success'));
         },
 
         /**
@@ -192,7 +192,7 @@ define([
             var error = Helpers.parseResponseError(response);
 
             if (error !== null) {
-                Helpers.showFieldsErrors(error, false);
+                Helpers.showFieldsErrors(error, true);
             } else {
                 console.error(response, response && response.responseText);
             }
@@ -215,7 +215,7 @@ define([
             this.elements.validateFields.controlStatus('base');
 
             if (errors !== null) {
-                Helpers.showFieldsErrors(errors, false);
+                Helpers.showFieldsErrors(errors, true);
                 return;
             }
 

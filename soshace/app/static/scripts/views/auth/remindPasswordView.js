@@ -111,7 +111,7 @@ define([
          * @returns {undefined}
          */
         submitSuccessHandler: function (model, response) {
-            alert('success: check your email');
+            alert(Helpers.i18n('Check your email to change password'));
         },
 
         /**
