@@ -121,7 +121,7 @@ var _ = require('underscore'),
             //поле доступно для отправки на клиент
             //Используется timestamp
             public: true,
-            type: String,
+            type: Date,
             default: null
         },
         password: {

@@ -134,7 +134,7 @@ define([
         },
 
         /**
-         * Метод обработчик отправки формы
+         * Form submit handler
          *
          * @method
          * @name UsersEditView#submitHandler
@@ -147,6 +147,7 @@ define([
 
             event.preventDefault();
             this.model.set(formData);
+            this.model.set({birthday: this.elements.birthday.calendar('getOptions').selectedDate});
             diff = this.model.changed;
 
             if (_.isEmpty(diff)) {
@@ -309,14 +310,16 @@ define([
         },
 
         /**
-         * Метод применяет плагин календаря к полям
+         * Method initializes calendar plugin
          *
          * @method
          * @name UsersEditView#setDatesControls
          * @returns {undefined}
          */
         setDatesControls: function () {
-            this.elements.birthday.calendar();
+            this.elements.birthday.calendar({
+                selectedDate: this.model.get('birthday')
+            });
         },
 
         /**
