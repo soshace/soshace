@@ -47,7 +47,8 @@ define([
          * @type {Object}
          */
         events: {
-            'submit': 'submitHandler'
+            'submit': 'submitHandler',
+            'click .js-save-messages .close': 'closeSaveMessage'
         },
 
         /**
@@ -271,6 +272,18 @@ define([
 
             profile = Soshace.profile;
             return !profile.emailConfirmed;
+        },
+
+        /**
+         * Method closes system messages on click on close button
+         *
+         * @method
+         * @name UsersEditView#closeSaveMessage
+         * @param e
+         * @returns {undefined}
+         */
+        closeSaveMessage: function(e) {
+            $(e.currentTarget).parent().remove();
         },
 
         /**
