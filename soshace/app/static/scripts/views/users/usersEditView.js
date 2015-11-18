@@ -147,8 +147,9 @@ define([
                 diff;
 
             event.preventDefault();
+
+            formData.birthday = this.elements.birthday.calendar('getOptions').selectedDate;
             this.model.set(formData);
-            this.model.set({birthday: this.elements.birthday.calendar('getOptions').selectedDate});
             diff = this.model.changed;
 
             if (_.isEmpty(diff)) {
