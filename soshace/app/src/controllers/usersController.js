@@ -53,6 +53,34 @@ module.exports = Controller.extend({
         }, this));
     },
 
+    uploadProfileImage: function() {
+        var response = this.response,
+            request = this.request,
+            image = request.file,
+            fs = require('fs'),
+            finalPath = image.path + '.jpeg';
+
+        console.log('uploaded file', image);
+
+        var MAX_IMAGE_SIZE_IN_BYTES = 50000;
+        if (image.size > MAX_IMAGE_SIZE_IN_BYTES) {
+            console.log('image is too big');
+            this.sendError('image is too big');
+            return;
+        }
+
+        console.log('save image to', finalPath);
+        fs.writeFile(finalPath, image, function(error) {
+            if (error) {
+                console.error('failed to save image', error);
+                return;
+            }
+
+            console.log('save success', finalPath);
+            response.end();
+        });
+    },
+
     /**
      * Метод обновления профиля пользователя
      * В параметрах запроса нужно передавать метод из модели

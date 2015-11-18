@@ -129,6 +129,7 @@ define(function () {
             locales: '/static/locales/',
             scripts: 'static/scripts/',
             images: '/static/images/',
+            profileImages: '/static/uploads/',
             api: {
                 login: '/api/login',
                 logout: '/api/logout',

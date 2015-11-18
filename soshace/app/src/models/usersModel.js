@@ -30,6 +30,12 @@ var _ = require('underscore'),
      * @type {Schema}
      */
     UsersShema = new Schema({
+        profileImg: {
+            type: String,
+            default: null,
+            public: true,
+            profileInformation: true
+        },
         //код подтверждения email
         code: {
             type: String,

@@ -65,6 +65,7 @@ module.exports = Class.extend({
         'patch /api/system_messages/:_id': 'systemMessagesController updateMessage',
         'post /api/reset-password': 'auth/remindPasswordController changePassword',
         'post /api/update-password': 'auth/remindPasswordController updatePassword',
+        'post /api/users/:username': 'usersController uploadProfileImage',
         //-------------------API end--------------------
 
         'get /': 'posts/postsController redirectToPosts',

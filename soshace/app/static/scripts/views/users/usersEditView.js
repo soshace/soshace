@@ -48,7 +48,8 @@ define([
          */
         events: {
             'submit': 'submitHandler',
-            'click .js-save-messages .close': 'closeSaveMessage'
+            'click .js-save-messages .close': 'closeSaveMessage',
+            '.js-change-img': 'addImage'
         },
 
         /**
@@ -134,6 +135,49 @@ define([
             this.model.set(userData);
         },
 
+        uploadImage: function() {
+            var imageFile = getImageFile.call(this, $('input[name="profileImg"]')[0].files);
+            var data = new FormData();
+            var self = this;
+
+            var reader = new FileReader();
+            reader.onload = function(event) {
+
+            };
+            reader.onloadend = function(e) {
+                showUploadedItem.call(self, e.target.result);
+            };
+            reader.readAsDataURL(imageFile);
+
+            data.append('profileImg', imageFile);
+
+            $.ajax({
+                url: '/api/users/vlad',
+                type: "POST",
+                data: data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    alert('success');
+                },
+                error: function() {
+                    alert('error');
+                }
+            });
+
+            function showUploadedItem (source) {
+                var $wrapper = this.$('.user__profile__info__avatar__img'),
+                    $img = $wrapper.find('img');
+
+                $img.attr('src', source);
+            }
+
+            function getImageFile(files) {
+                return files[0];
+            }
+        },
+
         /**
          * Form submit handler
          *
@@ -147,6 +191,11 @@ define([
                 diff;
 
             event.preventDefault();
+
+            if (true) {
+                this.uploadImage(formData);
+                return;
+            }
 
             formData.birthday = this.elements.birthday.calendar('getOptions').selectedDate;
             this.model.set(formData);
