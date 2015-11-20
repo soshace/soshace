@@ -56,11 +56,6 @@ var Blog = Class.extend({
      * @return {undefined}
      */
     configure: function () {
-        var multer  = require('multer'),
-            upload = multer({ dest: '/home/vagrant/projects/soshace/dist/uploads/'});
-
-        App.use(upload.single('profileImg'));
-
         App.use(bodyParser.json());
         App.use(bodyParser.urlencoded({     // to support URL-encoded bodies
             extended: true
@@ -96,7 +91,6 @@ var Blog = Class.extend({
             })
         }));
 
-        console.log('static path:', process.cwd() + '/dist');
         App.use("/static", express.static(process.cwd() + '/dist'));
     }
 });

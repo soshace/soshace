@@ -184,7 +184,8 @@ global.Soshace = {
         styles: '/static/styles/',
         images: '/static/images/',
         backgrounds: '/static/images/backgrounds/',
-        views: '/static/views/'
+        views: '/static/views/',
+        profileImages: '/dist/profileImages/'
     },
 
     /**

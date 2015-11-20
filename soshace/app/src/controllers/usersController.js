@@ -3,9 +3,12 @@ var Controller = srcRequire('common/controller'),
     _ = require('underscore'),
     UsersModel = srcRequire('models/usersModel'),
     PostsModel = srcRequire('models/postsModel'),
-    RequestParams = srcRequire('common/requestParams');
+    RequestParams = srcRequire('common/requestParams'),
+    uploadImage = srcRequire('vendors/uploadImage'),
+    deleteProfileImage = srcRequire('vendors/deleteProfileImage');
+
 /**
- * Контроллер страницы профиля пользователя
+ * Profile page controller
  *
  * @class UsersController
  */
@@ -53,31 +56,69 @@ module.exports = Controller.extend({
         }, this));
     },
 
+    /**
+     * Upload profile image handler
+     *
+     * checks if upload was successful
+     *  if not
+     *   send error to client
+     *
+     * if it was:
+     *  remove old image from disk
+     *  update profileImg field in db
+     *  send new file name to client
+     *
+     * @method
+     * @name UsersController#uploadProfileImage
+     * @returns {undefined}
+     */
     uploadProfileImage: function() {
-        var response = this.response,
-            request = this.request,
-            image = request.file,
-            fs = require('fs'),
-            finalPath = image.path + '.jpeg';
+        var self = this,
+            response = self.response,
+            request = self.request;
 
-        console.log('uploaded file', image);
+        uploadImage(request, response, function(error) {
+            var profile,
+                requestParameters,
+                updatedFields;
 
-        var MAX_IMAGE_SIZE_IN_BYTES = 50000;
-        if (image.size > MAX_IMAGE_SIZE_IN_BYTES) {
-            console.log('image is too big');
-            this.sendError('image is too big');
-            return;
-        }
-
-        console.log('save image to', finalPath);
-        fs.writeFile(finalPath, image, function(error) {
             if (error) {
-                console.error('failed to save image', error);
+                console.error('image was not saved', error);
+
+                // TODO: map error codes to messages for client
+                self.sendError('Image was not saved with error code ' + error.code, 400);
                 return;
             }
 
-            console.log('save success', finalPath);
-            response.end();
+            console.log('save file success', request.multerData);
+
+            requestParameters = new RequestParams(request);
+            profile = requestParameters.profile;
+            if (profile.profileImg !== '') {
+                // TODO: delete old image
+                deleteProfileImage(profile.profileImg, function(error) {
+                    if (error) {
+                        // TODO: save image name to db in this case?
+                        console.error('delete profile image error', 'name', profile.profileImg, 'error', error);
+                        return;
+                    }
+
+                    console.log('delete image success');
+                });
+            }
+
+            updatedFields = {
+                profileImg: request.multerData.fileName
+            };
+
+            UsersModel.updatePersonalData(profile._id, updatedFields, _.bind(function (error) {
+                if (error) {
+                    self.sendError(error);
+                    return;
+                }
+
+                response.send(updatedFields);
+            }));
         });
     },
 
