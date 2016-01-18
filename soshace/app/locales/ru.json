@@ -214,5 +214,8 @@
 	"Change": "Изменить",
 	"Passwords don&#39;t match": "Пароли не совпадают",
 	"Check your email to change password": "На указанную почту выслано письмо для смены пароля",
-	"Password change success": "Пароль успешно изменен"
+	"Password change success": "Пароль успешно изменен",
+    "Social business blog.": "Коллективный бизнес блог",
+    "<a class='js-router-link' href='/{{locale}}/posts/new'>Share</a> your experience with community of professionals.": "<a class='js-router-link' href='/{{locale}}/posts/new'>Поделись</a> своим опытом с сообществом профессионалов.",
+    "<a class='js-router-link' href='/{{locale}}/registration'>Start</a> your own business with us!": "<a class='js-router-link' href='/{{locale}}/registration'>Начни</a> свой бизнес с нами!"
 }
