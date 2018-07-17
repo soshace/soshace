@@ -48,3 +48,6 @@ Soshace.com
 </ul>
 
 After vagrant up go to http://10.0.33.34:8080
+
+
+Network for professionals [Soshace](https://soshace.com)
